@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "AI Chat Auto-Scroll Blocker (Local)",
+  "version": "1.0.0",
+  "description": "Blocks programmatic autoscroll on AI chat platforms. No popup, no storage, no background.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://gemini.google.com/*",
+        "https://claude.ai/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}
