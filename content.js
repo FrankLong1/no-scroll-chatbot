@@ -1,56 +1,61 @@
-(() => {
-  // Main-world script injection for blocking autoscroll
-  const pageCode = `
-    (() => {
-      let repatchInterval;
+// Main world content script - blocks autoscroll directly
+console.log('🚀 AI Chat Auto-Scroll Blocker loading on:', window.location.hostname);
 
-      // Hard block a method by making it non-writable and non-configurable
-      function hardBlock(owner, key) {
-        try {
-          Object.defineProperty(owner, key, {
-            value: () => {},
-            writable: false,
-            configurable: false
-          });
-        } catch (e) {
-          // Fallback: simple assignment
-          owner[key] = () => {};
-        }
-      }
+// Block scroll methods with debug logging
+function blockScrollMethod(owner, methodName, ownerName) {
+  try {
+    Object.defineProperty(owner, methodName, {
+      value: function(...args) {
+        console.log(`🚫 Blocked ${ownerName}.${methodName}() - autoscroll prevented`);
+        // Don't call the original method - just block it
+        return;
+      },
+      writable: false,
+      configurable: false
+    });
+    console.log(`✅ Successfully blocked ${ownerName}.${methodName}`);
+  } catch (e) {
+    // Fallback for older browsers or edge cases
+    owner[methodName] = function(...args) {
+      console.log(`🚫 Blocked ${ownerName}.${methodName}() - autoscroll prevented (fallback)`);
+      return;
+    };
+    console.log(`⚠️ Fallback block applied to ${ownerName}.${methodName}`);
+  }
+}
 
-      // Install scroll blocking patches
-      function install() {
-        // Block Element scroll methods
-        hardBlock(Element.prototype, 'scrollIntoView');
-        hardBlock(Element.prototype, 'scrollTo');
-        hardBlock(Element.prototype, 'scrollBy');
+// Install all scroll blocking
+function installScrollBlocks() {
+  // Block the main culprit - scrollIntoView
+  blockScrollMethod(Element.prototype, 'scrollIntoView', 'Element.prototype');
+  
+  // Block other scroll methods as defensive measures
+  blockScrollMethod(Element.prototype, 'scrollTo', 'Element.prototype');
+  blockScrollMethod(Element.prototype, 'scrollBy', 'Element.prototype');
+  blockScrollMethod(Element.prototype, 'scroll', 'Element.prototype');
+  
+  // Block window scroll methods
+  blockScrollMethod(window, 'scrollTo', 'window');
+  blockScrollMethod(window, 'scrollBy', 'window'); 
+  blockScrollMethod(window, 'scroll', 'window');
+  
+  // Disable smooth scrolling
+  if (document.documentElement) {
+    document.documentElement.style.scrollBehavior = 'auto';
+    console.log('✅ Disabled smooth scrolling');
+  }
+}
 
-        // Block Window scroll methods
-        hardBlock(window, 'scrollTo');
-        hardBlock(window, 'scrollBy');
+// Install immediately
+installScrollBlocks();
 
-        // Disable smooth scrolling behavior
-        document.documentElement.style.scrollBehavior = 'auto';
-      }
+// Re-install every second as defensive measure
+setInterval(installScrollBlocks, 1000);
 
-      // Initial install
-      install();
+// Clean logging
+console.log('✨ AI Chat Auto-Scroll Blocker active - autoscroll is now blocked!');
 
-      // Defensive re-patching every 1000ms
-      repatchInterval = setInterval(install, 1000);
-
-      // Clean up on page unload
-      window.addEventListener('beforeunload', () => {
-        if (repatchInterval) {
-          clearInterval(repatchInterval);
-        }
-      });
-    })();
-  `;
-
-  // Inject the page-world script
-  const script = document.createElement('script');
-  script.textContent = pageCode;
-  (document.head || document.documentElement).appendChild(script);
-  script.remove();
-})();
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+  console.log('👋 AI Chat Auto-Scroll Blocker unloading');
+});
