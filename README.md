@@ -1,122 +1,70 @@
-# AI Chat Auto-Scroll Blocker (Local)
+# Scroll-Lock for AI Chat
+
+Tired of losing your place when AI chats auto-scroll? This extension stops that. It's a simple, open-source, and privacy-focused solution to a very annoying problem.
+
+## The Problem
+
+You're reading a long, detailed response from an AI chatbot like ChatGPT, Gemini, or Claude. Halfway through, you think of a follow-up question and want to type it in before you forget. But as soon as the AI finishes generating its response, the page forcefully scrolls you to the bottom, and you lose your spot. You have to scroll back up and hunt for where you were, breaking your concentration. It's a frustrating experience, especially since many platforms have removed or broken their own "disable auto-scroll" features.
+
+## The Solution
+
+This extension prevents the annoying behavior where new messages auto-scroll you away from what you're reading.
+
+It works with a simple but effective rule:
+*   **It allows the first autoscroll** on each page or chat to happen, so you see the latest messages when they start generating.
+*   **It blocks all subsequent autoscrolls**, letting you read at your own pace without losing your position.
+
+Your manual scrolling (using your mouse wheel, trackpad, or keyboard) is completely unaffected. The extension works by intercepting the page's scroll commands and using a simple counter system, as detailed in the "How It Works" section below.
+
+## Why Another Scroll Blocker? (Open Source & Security)
+
+There are other extensions that do this, but most of them are not open-source. That's a major security and privacy concern. A browser extension that can inject JavaScript into a page requires significant permissions, giving it potential access to your conversations or personal data.
+
+This extension was built to be different:
+*   **100% Open Source:** You can see every line of code right here in this repository.
+*   **Extremely Simple:** The entire logic is in a single, ~100-line JavaScript file (`content.js`). It is heavily commented and easy to read and verify for yourself.
+*   **Privacy First:** It requests zero special permissions, stores no data, and makes no network requests. It cannot read your chats or track your activity.
+
+You shouldn't have to compromise your privacy for a better user experience.
 
 ## Installation
 
-### Step 1: Get the Extension Files
-- **Option A:** Download this repository as a ZIP file and extract it
-- **Option B:** Clone with Git: `git clone https://github.com/FrankLong1/no-scroll-chatbot.git`
+You have two options for installing this extension.
 
-### Step 2: Install in Chrome
-1. Open **Google Chrome**
-2. Go to `chrome://extensions/` (copy-paste this into address bar)
-3. In the top-right corner, enable **Developer mode** toggle
-4. Click the **Load unpacked** button that appears
-5. Browse to and select the `no-scroll-chatbot` folder (the one containing `manifest.json`)
-6. Click **Select Folder** or **Open**
+### Option 1: Install from the Chrome Web Store (Recommended)
 
-### Step 3: Verify Installation
-- You should see "AI Chat Auto-Scroll Blocker (Local)" appear in your extensions list
-- Make sure the toggle switch is **ON** (blue)
-- No extension icon will appear in your toolbar (this is intentional)
+For convenience, you can install this extension directly from the Chrome Web Store.
 
-### Step 4: Test It Out
-1. Visit [ChatGPT](https://chatgpt.com), [Gemini](https://gemini.google.com), or [Claude](https://claude.ai)
-2. Ask for a long response (like "write me a detailed 1000-word story")
-3. Notice the page doesn't auto-scroll as text appears
-4. Your manual scrolling still works perfectly
+[Link to Chrome Web Store] <-- I will add this link once it's published.
 
-### Troubleshooting Installation
-- **"Manifest file is missing or unreadable"**: Make sure you selected the folder containing `manifest.json`
-- **Extension not working**: Refresh the chat page after installation
-- **Can't find extensions page**: Type exactly `chrome://extensions/` in the address bar
+### Option 2: Install from Source Code (for Developers)
 
-## What It Does
+If you prefer to build it yourself or want to inspect the code before installing, you can load it directly from this repository.
 
-This extension uses a "first scroll only" approach:
-- **Allows the first autoscroll** on each page/chat so you see the latest messages when you arrive
-- **Blocks all subsequent autoscrolls** to prevent interruption while you're reading older messages
-- **Resets per chat/page** - each new conversation or navigation gets one initial scroll
-- **Preserves manual scrolling** - your mouse wheel, trackpad, keyboard, and touch gestures work normally
+**Step 1: Get the Extension Files**
+*   **Option A:** Download this repository as a ZIP file and extract it.
+*   **Option B:** Clone with Git: `git clone https://github.com/FrankLong1/no-scroll-chatbot.git`
 
-## Privacy Stance
+**Step 2: Install in Chrome**
+1.  Open **Google Chrome**.
+2.  Go to `chrome://extensions/` (copy-paste this into your address bar).
+3.  In the top-right corner, enable the **Developer mode** toggle.
+4.  Click the **Load unpacked** button that appears.
+5.  Browse to and select the `no-scroll-chatbot` folder (the one containing `manifest.json`).
+6.  Click **Select Folder** or **Open**.
 
-**Zero Permissions:** This extension requests no special permissions from Chrome.
-- **No storage** - doesn't save any data
-- **No background processes** - runs only when needed
-- **No network access** - completely offline
-- **No telemetry** - doesn't track or report anything
-- **No popup UI** - invisible once installed
-
-## How to Verify It's Working
-
-1. Visit [ChatGPT](https://chatgpt.com), [Gemini](https://gemini.google.com), or [Claude](https://claude.ai)
-2. Start a conversation that generates a long response
-3. **Without the extension:** The page automatically scrolls down as text appears
-4. **With the extension:** The page stays where you left it, no auto-scrolling
-5. **Manual scrolling:** Your mouse wheel, trackpad gestures, and keyboard still work normally
+The extension will be installed and active immediately.
 
 ## Supported Platforms
 
-- **ChatGPT** (`chatgpt.com`)
-- **Google Gemini** (`gemini.google.com`)
-- **Claude** (`claude.ai`)
+*   **ChatGPT** (`chatgpt.com`)
+*   **Google Gemini** (`gemini.google.com`)
+*   **Claude** (`claude.ai`)
 
-## Technical Details
+## How It Works
 
-This extension uses a counter-based approach with main-world script injection:
-
-**How It Works:**
-1. **Counter System**: Maintains a `scrollCount` that allows only the first scroll attempt per page/chat
-2. **URL Change Detection**: Detects client-side navigation (chat switching) by monitoring `window.location.href` 
-3. **Method Interception**: Patches JavaScript scroll methods to apply the counter logic:
-   - `Element.prototype.scrollIntoView` (primary autoscroll method)
-   - `Element.prototype.scrollTo` / `scrollBy`  
-   - `window.scrollTo` / `scrollBy`
-
-**Performance:**
-- **Minimal Overhead**: Only a string comparison per scroll attempt (very infrequent)
-- **Client-Side Navigation**: Automatically detects URL changes without page reloads
-- **Defensive Re-patching**: Re-applies patches every second to prevent framework interference
-
-The patches are non-writable and non-configurable, ensuring they can't be easily bypassed by page scripts.
-
-## FAQ
-
-**Q: Why don't I see any extension icon or UI?**  
-A: This extension runs silently without any interface. It's always active on supported sites.
-
-**Q: Can I turn it off temporarily?**  
-A: Go to `chrome://extensions/` and toggle the extension off, or remove it entirely.
-
-**Q: Does this affect other websites?**  
-A: No, it only runs on ChatGPT, Gemini, and Claude. Other sites are unaffected.
-
-**Q: Will this break the chat interfaces?**  
-A: No, it only blocks programmatic scrolling. All other functionality remains intact.
-
-**Q: Is my data safe?**  
-A: Yes, this extension has zero permissions and runs entirely locally. It cannot access, store, or transmit any data.
-
-## Troubleshooting
-
-**Extension not working:**
-1. Verify it's enabled in `chrome://extensions/`
-2. Refresh the chat page
-3. Check that you're on a supported domain
-
-**Manual scrolling not working:**
-1. This is likely a separate browser or system issue
-2. The extension only blocks programmatic scrolling, not user input
-
-## Development
-
-This is a minimal Manifest V3 extension with three files:
-- `manifest.json` - Extension configuration
-- `content.js` - Script injector
-- `README.md` - This documentation
-
-No build process required - load directly as an unpacked extension for development.
+The extension injects a small script that intercepts and overrides JavaScript's native scroll functions (`scrollIntoView`, `scrollTo`, etc.). It uses a simple counter to allow the first scroll attempt on a page load or navigation and blocks all subsequent attempts. It's a lightweight and effective approach that doesn't interfere with the chat application's functionality.
 
 ## License
 
-MIT License - Use freely for personal or commercial projects.
+This project is open-source and available under the MIT License.

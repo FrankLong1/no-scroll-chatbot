@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "AI Chat Auto-Scroll Blocker (Local)",
+  "name": "Open Source AI Chat Auto-Scroll Blocker",
   "version": "1.0.0",
   "description": "Blocks programmatic autoscroll on AI chat platforms. No popup, no storage, no background.",
   "content_scripts": [
